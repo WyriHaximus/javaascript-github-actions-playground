@@ -44,7 +44,6 @@ jobs:
   create-release:
     name: Create Release
     needs:
-      - tag-docker-image
       - generate-changelog
     runs-on: ubuntu-latest
     steps:
