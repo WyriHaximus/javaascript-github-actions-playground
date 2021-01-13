@@ -77,7 +77,6 @@ jobs:
           body: ${{ steps.releasemessage.outputs.release_message }}
           draft: false
           prerelease: false
-          commitish: release/${{ env.MILESTONE }}
       - uses: haya14busa/action-update-semver@v1
         with:
           tag: ${{ env.MILESTONE }}
