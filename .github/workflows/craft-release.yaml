@@ -52,10 +52,6 @@ jobs:
       - uses: actions/checkout@v1
       - name: Create release/${{ env.MILESTONE }} branch
         run: git checkout -b release/${{ env.MILESTONE }} ${GITHUB_SHA}
-      - run: sed -i 's/master/${{ env.MILESTONE }}/g' Dockerfile
-      - run: cat Dockerfile
-      - run: git add Dockerfile
-      - run: git status
       - run: echo -e "${CHANGELOG}" > release-${{ env.MILESTONE }}-changelog.md
         env:
           CHANGELOG: ${{ needs.generate-changelog.outputs.changelog }}
