@@ -21,14 +21,11 @@ jobs:
           checkInterval: 5
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-      - id: generate-version-strategy
-        if: steps.waitforstatuschecks.outputs.status != 'success'
+      - if: steps.waitforstatuschecks.outputs.status != 'success'
         name: Fail
         run: exit 1
   generate-changelog:
     name: Generate Changelog
-    needs:
-      - generate-version-strategy
     runs-on: ubuntu-latest
     outputs:
       changelog: ${{ steps.changelog.outputs.changelog }}
