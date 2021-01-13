@@ -50,19 +50,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Create release/${{ matrix.version }} branch
-        run: git checkout -b release/${{ matrix.version }} ${GITHUB_SHA}
-      - run: sed -i 's/master/${{ matrix.version }}/g' Dockerfile
+      - name: Create release/${{ env.MILESTONE }} branch
+        run: git checkout -b release/${{ env.MILESTONE }} ${GITHUB_SHA}
+      - run: sed -i 's/master/${{ env.MILESTONE }}/g' Dockerfile
       - run: cat Dockerfile
       - run: git add Dockerfile
       - run: git status
-      - run: echo -e "${CHANGELOG}" > release-${{ matrix.version }}-changelog.md
+      - run: echo -e "${CHANGELOG}" > release-${{ env.MILESTONE }}-changelog.md
         env:
           CHANGELOG: ${{ needs.generate-changelog.outputs.changelog }}
       - run: |
-          echo -e "${MILESTONE_DESCRIPTION}\r\n\r\n${CHANGELOG}" > release-${{ matrix.version }}-release-message.md
-          cat release-${{ matrix.version }}-release-message.md
-          release_message=$(cat release-${{ matrix.version }}-release-message.md)
+          echo -e "${MILESTONE_DESCRIPTION}\r\n\r\n${CHANGELOG}" > release-${{ env.MILESTONE }}-release-message.md
+          cat release-${{ env.MILESTONE }}-release-message.md
+          release_message=$(cat release-${{ env.MILESTONE }}-release-message.md)
           release_message="${release_message//'%'/'%25'}"
           release_message="${release_message//$'\n'/'%0A'}"
           release_message="${release_message//$'\r'/'%0D'}"
@@ -71,26 +71,26 @@ jobs:
         env:
           MILESTONE_DESCRIPTION: ${{ github.event.milestone.description }}
           CHANGELOG: ${{ needs.generate-changelog.outputs.changelog }}
-      - run: cat release-${{ matrix.version }}-changelog.md
+      - run: cat release-${{ env.MILESTONE }}-changelog.md
       - name: Set git commit user
         run: |
           git config user.name '${{ github.actor }}'
           git config user.email '${{ github.actor }}@users.noreply.github.com'
-      - run: git commit -F release-${{ matrix.version }}-changelog.md
-      - run: git tag -F release-${{ matrix.version }}-changelog.md ${{ matrix.version }}
+      - run: git commit -F release-${{ env.MILESTONE }}-changelog.md
+      - run: git tag -F release-${{ env.MILESTONE }}-changelog.md ${{ env.MILESTONE }}
       - name: Push changes
         uses: ad-m/github-push-action@v0.6.0
         with:
           tags: true
-          branch: release/${{ matrix.version }}
+          branch: release/${{ env.MILESTONE }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Create release
         uses: fleskesvor/create-release@feature/support-target-commitish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ matrix.version }}
-          release_name: ${{ matrix.version }}
+          tag_name: ${{ env.MILESTONE }}
+          release_name: ${{ env.MILESTONE }}
           body: ${{ steps.releasemessage.outputs.release_message }}
           draft: false
           prerelease: false
